@@ -4,7 +4,14 @@ from zope.component import adapts
 from Products.Maps.interfaces import IGeoLocation, IMarker, IRichMarker, IMap
 
 from Products.CMFPlone.utils import base_hasattr
-from Products.ATContentTypes.interface import IATTopic, IATFolder
+
+try:
+    from plone.app.contenttypes.interfaces import IFolder as IATFolder
+    from plone.app.collection.interfaces import ICollection as IATTopic
+except:
+    from Products.ATContentTypes.interface import IATFolder
+    from Products.ATContentTypes.interface import IATTopic
+
 
 class BaseMap(object):
     implements(IMap)

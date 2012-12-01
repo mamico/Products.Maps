@@ -58,42 +58,85 @@
       allowed_interface=".interfaces.map.IMapEnabledView"
       />
 
-  <browser:page
-      for="Products.ATContentTypes.interface.IATTopic"
-      name="maps_googlemaps_enabled_view"
-      class=".browser.map.FolderMapView"
-      permission="zope.Public"
-      allowed_interface=".interfaces.map.IMapEnabledView"
-      />
+  <configure zcml:condition="installed Products.ATContentTypes">
+    <browser:page
+        for="Products.ATContentTypes.interface.IATTopic"
+        name="maps_googlemaps_enabled_view"
+        class=".browser.map.FolderMapView"
+        permission="zope.Public"
+        allowed_interface=".interfaces.map.IMapEnabledView"
+        />
 
-  <browser:page
-      for="Products.ATContentTypes.interface.IATFolder"
-      name="maps_googlemaps_enabled_view"
-      class=".browser.map.FolderMapView"
-      permission="zope.Public"
-      allowed_interface=".interfaces.map.IMapEnabledView"
-      />
+    <browser:page
+        for="Products.ATContentTypes.interface.IATFolder"
+        name="maps_googlemaps_enabled_view"
+        class=".browser.map.FolderMapView"
+        permission="zope.Public"
+        allowed_interface=".interfaces.map.IMapEnabledView"
+        />
+
+    <browser:page
+        for="Products.ATContentTypes.interface.IATTopic"
+        name="maps_googlemaps_view"
+        class=".browser.map.FolderMapView"
+        permission="zope2.View"
+        allowed_interface=".interfaces.map.IMapView"
+        />
+
+    <browser:page
+        for="Products.ATContentTypes.interface.IATFolder"
+        name="maps_googlemaps_view"
+        class=".browser.map.FolderMapView"
+        permission="zope2.View"
+        allowed_interface=".interfaces.map.IMapView"
+        />
+
+  </configure>
+
+  <configure zcml:condition="installed plone.app.collection">
+
+    <browser:page
+        for="plone.app.collection.interfaces.ICollection"
+        name="maps_googlemaps_enabled_view"
+        class=".browser.map.FolderMapView"
+        permission="zope.Public"
+        allowed_interface=".interfaces.map.IMapEnabledView"
+        />
+
+    <browser:page
+        for="plone.app.collection.interfaces.ICollection"
+        name="maps_googlemaps_view"
+        class=".browser.map.FolderMapView"
+        permission="zope2.View"
+        allowed_interface=".interfaces.map.IMapView"
+        />
+
+  </configure>
+
+  <configure zcml:condition="installed plone.app.contenttypes">
+
+    <browser:page
+        for="plone.app.contenttypes.interface.IFolder"
+        name="maps_googlemaps_enabled_view"
+        class=".browser.map.FolderMapView"
+        permission="zope.Public"
+        allowed_interface=".interfaces.map.IMapEnabledView"
+        />
+
+    <browser:page
+        for="plone.app.contenttypes.interface.IFolder"
+        name="maps_googlemaps_view"
+        class=".browser.map.FolderMapView"
+        permission="zope2.View"
+        allowed_interface=".interfaces.map.IMapView"
+        />
+
+  </configure>
 
   <browser:page
       for="Products.Maps.interfaces.ILocation"
       name="maps_googlemaps_view"
       class=".browser.map.DefaultMapView"
-      permission="zope2.View"
-      allowed_interface=".interfaces.map.IMapView"
-      />
-
-  <browser:page
-      for="Products.ATContentTypes.interface.IATTopic"
-      name="maps_googlemaps_view"
-      class=".browser.map.FolderMapView"
-      permission="zope2.View"
-      allowed_interface=".interfaces.map.IMapView"
-      />
-
-  <browser:page
-      for="Products.ATContentTypes.interface.IATFolder"
-      name="maps_googlemaps_view"
-      class=".browser.map.FolderMapView"
       permission="zope2.View"
       allowed_interface=".interfaces.map.IMapView"
       />
