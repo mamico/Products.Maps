@@ -155,6 +155,17 @@ var _setupGeocoder = function ($search_text, $search_button, callback){
         });
     
     });
+    $search_text.keypress(function(e) {
+         if (e.which == 13) 
+         {
+              e.preventDefault();
+              geocoder.geocode( {'address': $search_text.val() }, function(results, status) {
+                  if(status === google.maps.GeocoderStatus.OK && results[0]){
+                      callback(results[0].geometry.location);
+                  }
+              });
+        }
+    });
 };
 
 /*
