@@ -1,10 +1,25 @@
 Changelog
 =========
 
-3.1 (unreleased)
+3.4 (unreleased)
 ----------------
 
 - Nothing changed yet.
+
+
+3.3 (2013-04-05)
+----------------
+
+- Store map objects in window.activeMaps to allow end-develops access
+  [StevenLooman]
+- added title in popup window [giacomos]  
+
+
+3.2 (2013-03-14)
+----------------
+
+- fix on location widget when used as archetype field [sithmel]
+- fix on save maps layout buttons (Plone3 only) [sithmel]
 
 
 3.0 (2013-01-25)

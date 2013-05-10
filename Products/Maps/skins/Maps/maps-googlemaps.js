@@ -15,13 +15,14 @@ var _createLocation = function($node) {
         info_window: (function (){
             var $wrapper = $('<div/>'),
                 $tabs, $handlers;
+            $node.find('.title').clone().appendTo($wrapper);
             $node.find('.tab').clone().appendTo($wrapper);
-        
+
             $tabs = $wrapper.find('.tab');
             // create tabs
             if ($tabs.length > 1){
                 $handlers = $('<div class="infowindowTabHandlers" />');
-                
+
                 $tabs.each(function (){
                     var $this = $(this);
                     var title = $this.attr('title');
@@ -35,7 +36,7 @@ var _createLocation = function($node) {
                 $handlers.find('.infowindowTabHandler').eq(0).click();
                 $wrapper.prepend($handlers);
             }
-            
+
             return new google.maps.InfoWindow({
                 content: $wrapper.get(0)
             });
@@ -43,10 +44,11 @@ var _createLocation = function($node) {
         marker: (function (){
             var icon_name = $node.find('img.marker').attr('alt'),
                 $geo = $node.find('.geo'),
-                position = new google.maps.LatLng(parseFloat($geo.find('.latitude').text()), 
+                position = new google.maps.LatLng(parseFloat($geo.find('.latitude').text()),
                                                   parseFloat($geo.find('.longitude').text()));
-
+            var marker_title = $node.find('.title a').text();
             return new google.maps.Marker({
+                title: marker_title,
                 icon: _all_icons[icon_name],
                 shadow:_all_shadows[icon_name],
                 position: position
@@ -57,7 +59,7 @@ var _createLocation = function($node) {
         }).get()
 
     };
-    
+
 };
 
 /*
@@ -117,7 +119,7 @@ var _reverseGeocoding = function (latLng, $search_text){
         else {
             $search_text.val(latLng.lat() + ', ' + latLng.lng());
         }
-    });            
+    });
 };
 
 /*
@@ -145,7 +147,7 @@ var _setupGeocoder = function ($search_text, $search_button, callback){
         select: function(event, ui) {
             callback(new google.maps.LatLng(ui.item.latitude, ui.item.longitude));
         }
-    });            
+    });
     $search_button.click(function (){
         geocoder.geocode( {'address': $search_text.val() }, function(results, status) {
             if(status === google.maps.GeocoderStatus.OK && results[0]){
@@ -153,7 +155,7 @@ var _setupGeocoder = function ($search_text, $search_button, callback){
                 callback(results[0].geometry.location);
             }
         });
-    
+
     });
     $search_text.keypress(function(e) {
          if (e.which == 13) 
@@ -233,7 +235,7 @@ var _set_zoom = function (map, locations){
         var c = w.mapsConfig.settings.center;
         map.setCenter(new google.maps.LatLng(c[0], c[1]));
         map.setZoom(w.mapsConfig.settings.zoom);
-    }  
+    }
     else {
         if (locations.length === 1){
             map.setCenter(locations[0].marker.getPosition());
@@ -258,13 +260,13 @@ var _set_zoom = function (map, locations){
 */
 
 var _searchForm = function($this, locations, map, marker_imhere){
-    var $search, $directions, $search_text, $search_button, $reset_button, 
+    var $search, $directions, $search_text, $search_button, $reset_button,
         $search_results, directionsRenderer, _search_results;
 
     // init
 
     $this.wrap('<div class="googleMapWrapper" />');
-    
+
     $search = $([
 '<div>',
 '<div class="googleMapSearchBar">' + w.mapsConfig.i18n.label_searchnearto + '</div>',
@@ -289,8 +291,8 @@ var _searchForm = function($this, locations, map, marker_imhere){
     $reset_button = $search.find(':reset');
 
     $search_results = $search.find('.googleMapSearchResults');
-    
-    directionsRenderer = new google.maps.DirectionsRenderer({});            
+
+    directionsRenderer = new google.maps.DirectionsRenderer({});
 
     // reset the map
     $reset_button.click(function (){
@@ -336,7 +338,7 @@ var _searchForm = function($this, locations, map, marker_imhere){
 '<div><h4><img src="' + marker_imhere.icon.url + '"/> ' + w.mapsConfig.i18n.label_nearestplaces + '</h4>',
 '</div>',
 '</div>'].join('')).appendTo($search_results);
-        
+
         bound = new google.maps.LatLngBounds();
 
         $.each(visible_locations.slice(0,5), function (){
@@ -413,7 +415,7 @@ var _searchForm = function($this, locations, map, marker_imhere){
         }
     });
 
-    // setting up the geocoder            
+    // setting up the geocoder
     _setupGeocoder($search_text, $search_button,_search_results);
 
 };
@@ -422,6 +424,7 @@ var _searchForm = function($this, locations, map, marker_imhere){
 var initViewMap = function (){
     var $this = $(this).addClass('googleMapActive'),
         $map_node = $('<div class="googleMapPane" />').appendTo($this),
+        $savelayout = $('#maps-save-layout'),
         map_options, map, locations, layers;
 
     $this.find('ul').hide();
@@ -476,6 +479,7 @@ var initViewMap = function (){
     };
 
     map = new google.maps.Map($map_node.get(0), map_options);
+    w.activeMaps.push(map);
 
     locations = _createLocations($this, map);
     layers = _getLayersList(locations);
@@ -489,45 +493,45 @@ var initViewMap = function (){
 
     // save settings
 
-    if($('.portaltype-folder #edit-bar, .portaltype-topic #edit-bar').length){
+    if($savelayout.length){
 
         $('<input type="button" value="' + w.mapsConfig.i18n.label_deletemapsettings +'"/>')
         .click(function (){
             var url = w.mapsConfig.context_url + '/@@maps_save_config';
-            
+
             $.post( url, {}, function (){
                 $('#kssPortalMessage').show();
                 $('#kssPortalMessage dd').text(w.mapsConfig.i18n.label_updatedmapsettings);
                 w.location = w.location;
             });
         })
-        .insertAfter($this);
+        .appendTo($savelayout);
 
         $('<input type="button" value="' + w.mapsConfig.i18n.label_savemapsettings +'"/>')
         .click(function (){
             var center = map.getCenter(),
                 url = w.mapsConfig.context_url + '/@@maps_save_config';
-            
+
             w.mapsConfig.settings.maptype = map.getMapTypeId();
             w.mapsConfig.settings.center = [center.lat(), center.lng()];
             w.mapsConfig.settings.zoom = map.getZoom();
-            
+
             $.post( url, w.mapsConfig.settings, function (){
                 $('#kssPortalMessage').show();
                 $('#kssPortalMessage dd').text(w.mapsConfig.i18n.label_updatedmapsettings);
             });
         })
-        .insertAfter($this);
+        .appendTo($savelayout);
     }
 
-    // search doesn't make sense with only one location            
+    // search doesn't make sense with only one location
     if (w.mapsConfig.search_active.toLowerCase() === 'true' && locations.length > 1){
         _searchForm($this, locations, map, new google.maps.Marker({
             icon: _all_icons['_yah'],
             shadow:_all_shadows['_yah'],
             map: map,
             visible:false
-        }));        
+        }));
     }
 
 
@@ -570,8 +574,9 @@ var initEditMap = function (){
         zoom: 16
     };
     map = new google.maps.Map($map_node.get(0), map_options);
+    w.activeMaps.push(map);
 
-    center = new google.maps.LatLng(parseFloat($input.eq(0).val()), 
+    center = new google.maps.LatLng(parseFloat($input.eq(0).val()),
                                     parseFloat($input.eq(1).val()));
 
     marker = new google.maps.Marker({draggable: true, position: center, map: map});
@@ -584,13 +589,14 @@ var initEditMap = function (){
     google.maps.event.addListener(marker, 'dragend', function (evt){
         _update_position();
     });
+
     // setting up geocoding
     $search_button = $('<input type="button" value="' + w.mapsConfig.i18n.label_search + '" class="searchButton" />').prependTo($this);
     $search_text = $('<input type="text" class="mapSearchBar" />').prependTo($this);
 
     _setupGeocoder($search_text, $search_button, function (latLng){
         marker.setPosition(latLng);
-        _update_position();                
+        _update_position();
     });
     $input.hide();
 
@@ -656,6 +662,7 @@ $.fn.productsMapEdit = function (){
 
 // start!
 $(document).ready(function() {
+    w.activeMaps = [];
     $('.googleMapView').productsMapView();
     $('.googleMapEdit').productsMapEdit();
 });
